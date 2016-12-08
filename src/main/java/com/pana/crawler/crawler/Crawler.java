@@ -21,7 +21,13 @@ import org.jsoup.select.Elements;
 
 public class Crawler {
 	
-	public String downloadHtml(String url){
+	/**
+	 * 传入url，将要访问的页面转换成String字符串
+	 * 
+	 * @param url
+	 * @return htmlString
+	 */
+	public String getHtmlString(String url){
 		
 		String htmlString = "";
 		HttpClient client = new DefaultHttpClient();
@@ -36,13 +42,19 @@ public class Crawler {
 				return htmlString;
 			}
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
 		return "";
 	}
 	
+	/**
+	 * 将访问的html页面保存为文件
+	 * 
+	 * @param htmlString
+	 * @throws ParseException、IOException
+	 * @throws 
+	 */
 	public void htmlToFile(String htmlString) throws ParseException, IOException{
 		String dirPath = "E:\\douban-html\\";
 		File dirFile = new File(dirPath);
@@ -65,18 +77,25 @@ public class Crawler {
         }
 	}
 
-	
+	/**
+	 * 处理response，Jsoup解析页面，获取所需数据
+	 * 
+	 * @param url
+	 */
 	public void getMovieList(String url){
 		List<String> movieType = null;
-		String html = downloadHtml(url);
+		String html = getHtmlString(url);
+		//将String类型的html转换为Document
 		Document doc = Jsoup.parse(html);
+		//获取所有class为pl2的元素，即包含所有<a>的div
 		Elements nodes = doc.getElementsByClass("pl2");	
+		//循环进入每个<a>，访问影片的详细信息
 		for(Element node : nodes){
 			Movie movie = new Movie();
 			movieType = new ArrayList<String>();
 			Element link = node.select("a").first();
 			String href = link.attr("href");
-			String detail = downloadHtml(href);
+			String detail = getHtmlString(href);
 			detail = detail.replace("property","class");
 			Document movieDetail = Jsoup.parse(detail);
 			Element name = movieDetail.getElementsByTag("h1").first();
@@ -94,7 +113,11 @@ public class Crawler {
 		
 	}
 	
-	
+	/**
+	 * 测试用main方法
+	 * 
+	 * @param args
+	 */
 	public static void main(String[] args){
 		
 		Crawler crawler = new Crawler();
